@@ -14,11 +14,15 @@ const productVersionSchema = new Schema({
         type: String,
         required: true
     },
+    quantity: {
+        type: Number,
+        required: true
+    },
     productId: {
         type: Schema.Types.ObjectId,
         ref: 'Product',
         required: true
-      }
+    },
 },
     { timestamps: true }
 );

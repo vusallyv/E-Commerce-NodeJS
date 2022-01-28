@@ -3,16 +3,24 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const cardSchema = new Schema({
-    products: [
+    productVersions: [
         {
-            type: Schema.Types.ObjectId,
-            ref: 'Product'
+            productVersionId: {
+                type: Schema.Types.ObjectId,
+                ref: 'ProductVersion',
+                required: true
+            },
+            quantity: {
+                type: Number,
+                required: true
+            },
         }
     ],
     user: {
         type: Schema.Types.ObjectId,
         ref: 'User'
     }
-}, timeStamp = true);
+}, { timestamps: true }
+);
 
 module.exports = mongoose.model('Card', cardSchema);

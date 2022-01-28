@@ -1,12 +1,11 @@
 const Signup = {
     singupManager(email, password, name) {
         const url = `http://127.0.0.1:8080/auth/signup`;
-        fetch(url, {
-            method: 'POST',
-            // credentials: 'include',
-            // headers: {
-            //     'Content-Type': 'application/json',
-            // },
+        fetch('http://127.0.0.1:8080/auth/signup', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify({
                 'email': email,
                 'password': password,
@@ -15,7 +14,7 @@ const Signup = {
         })
             .then(response => response.json())
             .then(data => {
-                window.location.href = 'http://127.0.0.1:5500/IMcom-front/register.html';
+                window.location.href = 'http://127.0.0.1:5500/IMcom-front/login.html';
             });
     }
 }
@@ -26,5 +25,6 @@ signup.addEventListener('click', (e) => {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const name = document.getElementById('name').value;
+    console.log(email, password, name);
     Signup.singupManager(email, password, name);
 });

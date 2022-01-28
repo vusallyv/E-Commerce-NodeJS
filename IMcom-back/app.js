@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const multer = require('multer');
 
-const feedRoutes = require('./routes/feed');
+const cardRoutes = require('./routes/card');
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/product');
 
@@ -49,7 +49,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/feed', feedRoutes);
+app.use('/card', cardRoutes);
 app.use('/auth', authRoutes);
 app.use('/product', productRoutes);
 
