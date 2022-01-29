@@ -5,34 +5,49 @@ const { validationResult } = require('express-validator/check');
 
 const Card = require('../models/card');
 const User = require('../models/user');
-const { log } = require('console');
+// const { log } = require('console');
 
-// exports.getCards = (req, res, next) => {
-//   const currentPage = req.query.page || 1;
-//   const perPage = 2;
-//   let totalItems;
-//   Card.find()
-//     .countDocuments()
-//     .then(count => {
-//       totalItems = count;
-//       return Card.find()
-//         .skip((currentPage - 1) * perPage)
-//         .limit(perPage);
-//     })
-//     .then(cards => {
-//       res.status(200).json({
-//         message: 'Fetched cards successfully.',
-//         cards: cards,
-//         totalItems: totalItems
-//       });
-//     })
-//     .catch(err => {
-//       if (!err.statusCode) {
-//         err.statusCode = 500;
-//       }
-//       next(err);
-//     });
-// };
+exports.getCard = (req, res, next) => {
+  User.findById(req.userId).then(user => {
+    if (!user) {
+      const error = new Error('Could not find user.');
+      error.statusCode = 404;
+      throw error;
+    } else {
+      Card.findOne({ user: req.userId }).populate('productVersions.productVersionId')
+      .then(card => {
+        if (!card) {
+          const error = new Error('Could not find card.');
+          error.statusCode = 404;
+          throw error;
+        } else {
+          res.status(200).json({
+            message: 'Card fetched successfully!',
+            card: card,
+          });
+        }
+      });
+    }
+  }).catch(err => {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  });
+  // .then(cards => {
+  //     res.status(200).json({
+  //       message: 'Fetched cards successfully.',
+  //       cards: cards,
+  //       totalItems: totalItems
+  //     });
+  //   })
+  //   .catch(err => {
+  //     if (!err.statusCode) {
+  //       err.statusCode = 500;
+  //     }
+  //     next(err);
+  //   });
+};
 
 exports.addToBasket = (req, res, next) => {
   const errors = validationResult(req);
@@ -67,21 +82,19 @@ exports.addToBasket = (req, res, next) => {
             message: 'Card added successfully!',
             card: card,
           });
-          // const error = new Error('Could not find card.');
-          // error.statusCode = 404;
-          // throw error;
         } else {
-          card.productVersions.forEach(productVersion => {
-            if (productVersion.productVersionId.toString() === req.body.productVersionId) {
-              productVersion.quantity += 1;
-            } else {
-              card.productVersions.push({
-                productVersionId: req.body.productVersionId,
-                quantity: req.body.quantity || 1,
-                // price: req.body.price,
-              });
-            }
-          });
+          const productVersion = card.productVersions.find(
+            pv => pv.productVersionId == req.body.productVersionId
+          );
+          if (!productVersion) {
+            console.log('productVersion');
+            card.productVersions.push({
+              productVersionId: req.body.productVersionId,
+              quantity: req.body.quantity || 1,
+            });
+          } else {
+            productVersion.quantity += 1;
+          }
           card.save();
           res.status(201).json({
             message: 'Card updated successfully!',
