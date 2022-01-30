@@ -13,7 +13,8 @@ const fetchCard = () => {
         .then(response => response.json())
         .then(data => {
             cart_products = document.getElementById('cart-products');
-            console.log(data.card.productVersions);
+            item_count = document.getElementById('item-count');
+            item_count.innerHTML = data.card.productVersions.length;
             data.card.productVersions.forEach(productVersion => {
                 cart_products.innerHTML += `
                 <div class="row">
@@ -21,7 +22,7 @@ const fetchCard = () => {
                   <!-- Image -->
                   <div class="bg-image hover-overlay hover-zoom ripple rounded" data-mdb-ripple-color="light">
                     <img src="${productVersion.productVersionId.image}"
-                      class="w-100" alt="{productVersion.product.title}" />
+                      class="w-100" alt="${productVersion.productVersionId.productId.title}" />
                     <a href="#!">
                       <div class="mask" style="background-color: rgba(251, 251, 251, 0.2)"></div>
                     </a>
@@ -31,7 +32,7 @@ const fetchCard = () => {
   
                 <div class="col-lg-5 col-md-6 mb-4 mb-lg-0">
                   <!-- Data -->
-                  <p><strong>{productVersion.product.title}</strong></p>
+                  <p><strong>${productVersion.productVersionId.productId.title}</strong></p>
                   <p>Color: ${productVersion.productVersionId.color}</p>
                   <button type="button" class="btn btn-primary btn-sm me-1 mb-2" data-mdb-toggle="tooltip"
                     title="Remove item">
@@ -66,14 +67,14 @@ const fetchCard = () => {
   
                   <!-- Price -->
                   <p class="text-start text-md-center">
-                    <strong>{productVersion.product.price}</strong>
+                    <strong>${productVersion.productVersionId.productId.price}</strong>
                   </p>
                   <!-- Price -->
                 </div>
               </div>
-                `
+              <hr class="my-4" />  
+              `
             });
-            console.log(localStorage.getItem('userId'));
         });
 };
 

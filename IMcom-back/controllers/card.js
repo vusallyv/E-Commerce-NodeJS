@@ -14,19 +14,26 @@ exports.getCard = (req, res, next) => {
       error.statusCode = 404;
       throw error;
     } else {
-      Card.findOne({ user: req.userId }).populate('productVersions.productVersionId')
-      .then(card => {
-        if (!card) {
-          const error = new Error('Could not find card.');
-          error.statusCode = 404;
-          throw error;
-        } else {
-          res.status(200).json({
-            message: 'Card fetched successfully!',
-            card: card,
-          });
-        }
-      });
+      Card.findOne({ user: req.userId }).populate({
+        path: 'productVersions.productVersionId',
+        model: 'ProductVersion',
+        populate: {
+          path: 'productId',
+          model: 'Product',
+        },
+      })
+        .then(card => {
+          if (!card) {
+            const error = new Error('Could not find card.');
+            error.statusCode = 404;
+            throw error;
+          } else {
+            res.status(200).json({
+              message: 'Card fetched successfully!',
+              card: card,
+            });
+          }
+        });
     }
   }).catch(err => {
     if (!err.statusCode) {
