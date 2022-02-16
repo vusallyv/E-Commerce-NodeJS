@@ -3,18 +3,17 @@ const path = require('path');
 
 const { validationResult } = require('express-validator/check');
 
-const Card = require('../models/card');
+const Cart = require('../models/cart');
 const User = require('../models/user');
-// const { log } = require('console');
 
-exports.getCard = (req, res, next) => {
+exports.getCart = (req, res, next) => {
   User.findById(req.userId).then(user => {
     if (!user) {
       const error = new Error('Could not find user.');
       error.statusCode = 404;
       throw error;
     } else {
-      Card.findOne({ user: req.userId }).populate({
+      Cart.findOne({ user: req.userId }).populate({
         path: 'productVersions.productVersionId',
         model: 'ProductVersion',
         populate: {
@@ -22,15 +21,15 @@ exports.getCard = (req, res, next) => {
           model: 'Product',
         },
       })
-        .then(card => {
-          if (!card) {
-            const error = new Error('Could not find card.');
+        .then(cart => {
+          if (!cart) {
+            const error = new Error('Could not find cart.');
             error.statusCode = 404;
             throw error;
           } else {
             res.status(200).json({
-              message: 'Card fetched successfully!',
-              card: card,
+              message: 'Cart fetched successfully!',
+              cart: cart,
             });
           }
         });
@@ -41,19 +40,6 @@ exports.getCard = (req, res, next) => {
     }
     next(err);
   });
-  // .then(cards => {
-  //     res.status(200).json({
-  //       message: 'Fetched cards successfully.',
-  //       cards: cards,
-  //       totalItems: totalItems
-  //     });
-  //   })
-  //   .catch(err => {
-  //     if (!err.statusCode) {
-  //       err.statusCode = 500;
-  //     }
-  //     next(err);
-  //   });
 };
 
 exports.addToBasket = (req, res, next) => {
@@ -74,38 +60,38 @@ exports.addToBasket = (req, res, next) => {
       error.statusCode = 404;
       throw error;
     } else {
-      Card.findOne({ user: req.body.userId }).then(card => {
-        if (!card) {
-          card = new Card({
+      Cart.findOne({ user: req.body.userId }).then(cart => {
+        if (!cart) {
+          cart = new Cart({
             productVersions: [],
             user: req.body.userId,
           });
-          card.productVersions.push({
+          cart.productVersions.push({
             productVersionId: req.body.productVersionId,
             quantity: req.body.quantity || 1,
           });
-          card.save();
+          cart.save();
           res.status(201).json({
-            message: 'Card added successfully!',
-            card: card,
+            message: 'Cart added successfully!',
+            cart: cart,
           });
         } else {
-          const productVersion = card.productVersions.find(
+          const productVersion = cart.productVersions.find(
             pv => pv.productVersionId == req.body.productVersionId
           );
           if (!productVersion) {
             console.log('productVersion');
-            card.productVersions.push({
+            cart.productVersions.push({
               productVersionId: req.body.productVersionId,
               quantity: req.body.quantity || 1,
             });
           } else {
             productVersion.quantity += 1;
           }
-          card.save();
+          cart.save();
           res.status(201).json({
-            message: 'Card updated successfully!',
-            card: card,
+            message: 'Cart updated successfully!',
+            cart: cart,
           });
         }
       });
@@ -120,26 +106,26 @@ exports.addToBasket = (req, res, next) => {
   // const title = req.body.title;
   // const content = req.body.content;
   // let creator;
-  // const card = new Card({
+  // const cart = new Cart({
   //   title: title,
   //   content: content,
   //   imageUrl: imageUrl,
   //   creator: req.userId
   // });
-  // card
+  // cart
   //   .save()
   //   .then(result => {
   //     return User.findById(req.userId);
   //   })
   //   .then(user => {
   //     creator = user;
-  //     user.cards.push(card);
+  //     user.carts.push(cart);
   //     return user.save();
   //   })
   //   .then(result => {
   //     res.status(201).json({
-  //       message: 'Card created successfully!',
-  //       card: card,
+  //       message: 'Cart created successfully!',
+  //       cart: cart,
   //       creator: { _id: creator._id, name: creator.name }
   //     });
   //   })
@@ -151,16 +137,16 @@ exports.addToBasket = (req, res, next) => {
   // });
 };
 
-// exports.getCard = (req, res, next) => {
-//   const cardId = req.params.cardId;
-//   Card.findById(cardId)
-//     .then(card => {
-//       if (!card) {
-//         const error = new Error('Could not find card.');
+// exports.getCart = (req, res, next) => {
+//   const cartId = req.params.cartId;
+//   Cart.findById(cartId)
+//     .then(cart => {
+//       if (!cart) {
+//         const error = new Error('Could not find cart.');
 //         error.statusCode = 404;
 //         throw error;
 //       }
-//       res.status(200).json({ message: 'Card fetched.', card: card });
+//       res.status(200).json({ message: 'Cart fetched.', cart: cart });
 //     })
 //     .catch(err => {
 //       if (!err.statusCode) {
@@ -171,7 +157,7 @@ exports.addToBasket = (req, res, next) => {
 // };
 
 exports.updateBasket = (req, res, next) => {
-  const cardId = req.params.cardId;
+  const cartId = req.params.cartId;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const error = new Error('Validation failed, entered data is incorrect.');
@@ -189,28 +175,28 @@ exports.updateBasket = (req, res, next) => {
     error.statusCode = 422;
     throw error;
   }
-  Card.findById(cardId)
-    .then(card => {
-      if (!card) {
-        const error = new Error('Could not find card.');
+  Cart.findById(cartId)
+    .then(cart => {
+      if (!cart) {
+        const error = new Error('Could not find cart.');
         error.statusCode = 404;
         throw error;
       }
-      if (card.creator.toString() !== req.userId) {
+      if (cart.creator.toString() !== req.userId) {
         const error = new Error('Not authorized!');
         error.statusCode = 403;
         throw error;
       }
-      if (imageUrl !== card.imageUrl) {
-        clearImage(card.imageUrl);
+      if (imageUrl !== cart.imageUrl) {
+        clearImage(cart.imageUrl);
       }
-      card.title = title;
-      card.imageUrl = imageUrl;
-      card.content = content;
-      return card.save();
+      cart.title = title;
+      cart.imageUrl = imageUrl;
+      cart.content = content;
+      return cart.save();
     })
     .then(result => {
-      res.status(200).json({ message: 'Card updated!', card: result });
+      res.status(200).json({ message: 'Cart updated!', cart: result });
     })
     .catch(err => {
       if (!err.statusCode) {
@@ -220,33 +206,33 @@ exports.updateBasket = (req, res, next) => {
     });
 };
 
-// exports.deleteCard = (req, res, next) => {
-//   const cardId = req.params.cardId;
-//   Card.findById(cardId)
-//     .then(card => {
-//       if (!card) {
-//         const error = new Error('Could not find card.');
+// exports.deleteCart = (req, res, next) => {
+//   const cartId = req.params.cartId;
+//   Cart.findById(cartId)
+//     .then(cart => {
+//       if (!cart) {
+//         const error = new Error('Could not find cart.');
 //         error.statusCode = 404;
 //         throw error;
 //       }
-//       if (card.creator.toString() !== req.userId) {
+//       if (cart.creator.toString() !== req.userId) {
 //         const error = new Error('Not authorized!');
 //         error.statusCode = 403;
 //         throw error;
 //       }
 //       // Check logged in user
-//       clearImage(card.imageUrl);
-//       return Card.findByIdAndRemove(cardId);
+//       clearImage(cart.imageUrl);
+//       return Cart.findByIdAndRemove(cartId);
 //     })
 //     .then(result => {
 //       return User.findById(req.userId);
 //     })
 //     .then(user => {
-//       user.cards.pull(cardId);
+//       user.carts.pull(cartId);
 //       return user.save();
 //     })
 //     .then(result => {
-//       res.status(200).json({ message: 'Deleted card.' });
+//       res.status(200).json({ message: 'Deleted cart.' });
 //     })
 //     .catch(err => {
 //       if (!err.statusCode) {

@@ -2,23 +2,24 @@ const fs = require('fs');
 const path = require('path');
 
 const Product = require('../models/product');
-const productVersion = require('../models/productVersion');
 const ProductVersion = require('../models/productVersion');
 
 exports.getProducts = (req, res, next) => {
-    ProductVersion.find().populate('productId')
-        .then(productVersions => {
-            res.status(200).json({
-                message: 'Fetched productversions successfully.',
-                productVersions: productVersions,
-            });
-        })
-        .catch(err => {
-            if (!err.statusCode) {
-                err.statusCode = 500;
-            }
-            next(err);
+    skip = parseInt(req.skip);
+    limit = parseInt(req.limit);
+    ProductVersion.find().populate('productId').skip(skip || 0).limit(limit || 9)
+    .then(productVersions => {
+        res.status(200).json({
+            message: 'Fetched productversions successfully.',
+            productVersions: productVersions,
         });
+    })
+    .catch(err => {
+        if (!err.statusCode) {
+            err.statusCode = 500;
+        }
+        next(err);
+    });
 };
 
 

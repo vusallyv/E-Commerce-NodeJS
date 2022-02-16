@@ -2,7 +2,7 @@ const { timeStamp } = require('console');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const cardSchema = new Schema({
+const cartSchema = new Schema({
     productVersions: [
         {
             productVersionId: {
@@ -23,4 +23,4 @@ const cardSchema = new Schema({
 }, { timestamps: true }
 );
 
-module.exports = mongoose.model('Card', cardSchema);
+module.exports = mongoose.model('Cart', cartSchema);

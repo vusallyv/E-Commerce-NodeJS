@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const multer = require('multer');
 
-const cardRoutes = require('./routes/card');
+const cartRoutes = require('./routes/cart');
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/product');
 
@@ -49,7 +49,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/card', cardRoutes);
+app.use('/cart', cartRoutes);
 app.use('/auth', authRoutes);
 app.use('/product', productRoutes);
 
@@ -66,6 +66,10 @@ mongoose
     'mongodb+srv://vusallyv:pulsar12345@cluster0.86vlw.mongodb.net/test?authSource=admin&replicaSet=atlas-opqyuf-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true'
   )
   .then(result => {
-    app.listen(8080);
+    const server = app.listen(8080);
+    const io = require('socket.io')(server);
+    io.on('connection', socket => {
+      console.log('Client connected');
+    });
   })
   .catch(err => console.log(err));

@@ -1,58 +1,16 @@
-const fetchProduct = () => {
-  const url = `http://127.0.0.1:8080/product/product/${id}`;
-  fetch(url)
-    .then(response => response.json())
-    .then(data => {
-      product = data.product;
-      page_title = document.getElementById('page_title');
-      if (product) {
-        const productsDiv = document.getElementById('products');
-        page_title.innerHTML = product.productId.title;
-        productsDiv.innerHTML = `
-                <div class="col-12">
-                <div class="box">
-                <div class="img-box">
-                <img src="${product.image}" alt="">
-                <a href="#" class="add_cart_btn" data-id="${product._id}">
-                <span class="add-to-cart">
-                Add To Cart
-                </span>
-                </a>
-                </div>
-                <div class="detail-box">
-                <a href="?id=${product._id}" style="color: black;">
-                <h5>
-                ${product.description}
-                </h5>
-                </a>
-                <div class="product_info">
-                <h5>
-                <span>$</span> ${product.productId.price}
-                </h5>
-                <div class="star_container">
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                </div>
-                </div>
-                </div>
-                </div>
-                </div>    
-                `
-      }
-      else {
-        page_title.innerHTML = 'Product Not Found';
-      }
-      view_more_btn = document.getElementById('view_more-btn');
-      view_more_btn.innerHTML = '';
-    });
-};
 
 const fetchProducts = () => {
   const url = 'http://127.0.0.1:8080/product/products';
-  fetch(url)
+  fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    params: {
+      skip: 0,
+      limit: 1,
+    }
+  })
     .then(response => response.json())
     .then(data => {
       const productsDiv = document.getElementById('products');
@@ -71,7 +29,7 @@ const fetchProducts = () => {
                     </a>
                   </div>
                   <div class="detail-box">
-                  <a href="?id=${product._id}" style="color: black;">
+                  <a href="http://127.0.0.1:5500/IMcom-front/single-product.html?id=${product._id}" style="color: black;">
                     <h5>
                     ${product.productId.title}
                     </h5>
@@ -100,18 +58,5 @@ const fetchProducts = () => {
     });
 };
 
-window.addEventListener('load', selectFetch(location.href));
-
-function selectFetch(url) {
-  params = url.split('?')[1];
-  if (params && params.includes('id=')) {
-    params.split('&').forEach(param => {
-      if (param.includes('id=')) {
-        id = param.split('=')[1];
-        fetchProduct();
-      }
-    });
-  } else {
-    fetchProducts();
-  }
-}    
+window.addEventListener('load', fetchProducts(location.href));
+  

@@ -18,10 +18,10 @@ const userSchema = new Schema({
     type: String,
     default: 'I am new!'
   },
-  cards: [
+  carts: [
     {
       type: Schema.Types.ObjectId,
-      ref: 'Card'
+      ref: 'Cart'
     }
   ]
 });

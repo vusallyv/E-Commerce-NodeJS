@@ -1,5 +1,5 @@
 const BasketLogic = (userId, productVersionId, quantity) => {
-    const url = 'http://127.0.0.1:8080/card/card'
+    const url = 'http://127.0.0.1:8080/cart/cart'
     fetch(url, {
         method: 'POST',
         headers: {

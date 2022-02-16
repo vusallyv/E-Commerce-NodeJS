@@ -57,7 +57,7 @@ function logout() {
 function setCartCount(data) {
     cart_count = document.getElementById('cart-count');
     count = 0;
-    data.card.productVersions.forEach(productVersion => {
+    data.cart.productVersions.forEach(productVersion => {
         count += productVersion.quantity;
     });
     cart_count.innerText = count;

@@ -1,5 +1,5 @@
-const fetchCard = () => {
-    const url = `http://127.0.0.1:8080/card/cards`;
+const fetchCart = () => {
+    const url = `http://127.0.0.1:8080/cart/carts`;
     fetch(url, {
         method: 'GET',
         headers: {
@@ -14,8 +14,8 @@ const fetchCard = () => {
         .then(data => {
             cart_products = document.getElementById('cart-products');
             item_count = document.getElementById('item-count');
-            item_count.innerHTML = data.card.productVersions.length;
-            data.card.productVersions.forEach(productVersion => {
+            item_count.innerHTML = data.cart.productVersions.length;
+            data.cart.productVersions.forEach(productVersion => {
                 cart_products.innerHTML += `
                 <div class="row">
                 <div class="col-lg-3 col-md-12 mb-4 mb-lg-0">
@@ -54,7 +54,7 @@ const fetchCard = () => {
                     </button>
   
                     <div class="form-outline">
-                      <input id="form2" min="0" name="quantity" value="${productVersion.quantity}" type="number" class="form-control" />
+                      <input data-id="${productVersion._id}" id="form2" onchange="changeQuantity(this)" min="0" name="quantity" value="${productVersion.quantity}" type="number" class="form-control" />
                       <label class="form-label" for="form2">Quantity</label>
                     </div>
   
@@ -78,4 +78,8 @@ const fetchCard = () => {
         });
 };
 
-window.addEventListener('load', fetchCard());
+window.addEventListener('load', fetchCart());
+
+function changeQuantity(element) {
+  console.log(element.value);
+}
