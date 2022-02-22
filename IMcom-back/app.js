@@ -1,5 +1,15 @@
 const path = require('path');
 
+const AdminJS = require('adminjs')
+const AdminJSExpress = require('@adminjs/express')
+
+const adminJs = new AdminJS({
+  databases: [],
+  rootPath: '/admin',
+})
+
+const router = AdminJSExpress.buildRouter(adminJs)
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -62,14 +72,16 @@ app.use((error, req, res, next) => {
 });
 
 mongoose
-  .connect(
-    'mongodb+srv://vusallyv:pulsar12345@cluster0.86vlw.mongodb.net/test?authSource=admin&replicaSet=atlas-opqyuf-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true'
+.connect(
+  'mongodb+srv://vusallyv:pulsar12345@cluster0.86vlw.mongodb.net/test?authSource=admin&replicaSet=atlas-opqyuf-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true'
   )
   .then(result => {
-    const server = app.listen(8080);
-    const io = require('socket.io')(server);
-    io.on('connection', socket => {
-      console.log('Client connected');
-    });
+    app.use(adminJs.options.rootPath, router)
+    app.listen(8080, () => console.log('AdminJS is under localhost:8080/admin'))
+    // const server = app.listen(8080);
+    // const io = require('socket.io')(server);
+    // io.on('connection', socket => {
+    //   console.log('Client connected');
+    // });
   })
   .catch(err => console.log(err));
