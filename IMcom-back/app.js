@@ -78,10 +78,5 @@ mongoose
   .then(result => {
     app.use(adminJs.options.rootPath, router)
     app.listen(8080, () => console.log('AdminJS is under localhost:8080/admin'))
-    // const server = app.listen(8080);
-    // const io = require('socket.io')(server);
-    // io.on('connection', socket => {
-    //   console.log('Client connected');
-    // });
   })
   .catch(err => console.log(err));
