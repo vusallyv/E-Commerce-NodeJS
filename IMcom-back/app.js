@@ -1,18 +1,29 @@
 const path = require('path');
 
+const mongoose = require('mongoose')
 const AdminJS = require('adminjs')
 const AdminJSExpress = require('@adminjs/express')
+const AdminJSMongoose = require('@adminjs/mongoose')
 
-const adminJs = new AdminJS({
-  databases: [],
-  rootPath: '/admin',
-})
 
-const router = AdminJSExpress.buildRouter(adminJs)
+AdminJS.registerAdapter(AdminJSMongoose)
+
+const run = async () => {
+  const mongooseDb = await mongoose.connect('mongodb+srv://vusallyv:pulsar12345@cluster0.86vlw.mongodb.net/test?authSource=admin&replicaSet=atlas-opqyuf-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true', { useNewUrlParser: true })
+
+  const adminJs = new AdminJS({
+    databases: [mongooseDb],
+  })
+  const router = AdminJSExpress.buildRouter(adminJs)
+
+  app.use(adminJs.options.rootPath, router)
+  app.listen(8080, () => console.log('AdminJS is under localhost:8080/admin'))
+}
+
+run()
 
 const express = require('express');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
 const multer = require('multer');
 
 const cartRoutes = require('./routes/cart');
@@ -71,12 +82,12 @@ app.use((error, req, res, next) => {
   res.status(status).json({ message: message, data: data });
 });
 
-mongoose
-.connect(
-  'mongodb+srv://vusallyv:pulsar12345@cluster0.86vlw.mongodb.net/test?authSource=admin&replicaSet=atlas-opqyuf-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true'
-  )
-  .then(result => {
-    app.use(adminJs.options.rootPath, router)
-    app.listen(8080, () => console.log('AdminJS is under localhost:8080/admin'))
-  })
-  .catch(err => console.log(err));
+// mongoose
+// .connect(
+//   'mongodb+srv://vusallyv:pulsar12345@cluster0.86vlw.mongodb.net/test?authSource=admin&replicaSet=atlas-opqyuf-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true'
+//   )
+//   .then(result => {
+//     app.use(adminJs.options.rootPath, router)
+//     app.listen(8080, () => console.log('AdminJS is under localhost:8080/admin'))
+//   })
+//   .catch(err => console.log(err));
