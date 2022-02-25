@@ -4,15 +4,34 @@ const mongoose = require('mongoose')
 const AdminJS = require('adminjs')
 const AdminJSExpress = require('@adminjs/express')
 const AdminJSMongoose = require('@adminjs/mongoose')
+const User = require('./models/user')
+const argon2 = require('argon2')
+const hashPassword = require('@adminjs/passwords')
 
 
 AdminJS.registerAdapter(AdminJSMongoose)
 
 const run = async () => {
-  const mongooseDb = await mongoose.connect('mongodb+srv://vusallyv:pulsar12345@cluster0.86vlw.mongodb.net/test?authSource=admin&replicaSet=atlas-opqyuf-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true', { useNewUrlParser: true })
+  const mongooseDb = await mongoose.connect('mongodb+srv://vusallyv:pulsar12345@cluster0.86vlw.mongodb.net/test?authSource=admin&replicaSet=atlas-opqyuf-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true', { useNewUrlParser: true, useUnifiedTopology: true })
 
   const adminJs = new AdminJS({
     databases: [mongooseDb],
+    resources: [
+      {
+        resource: User,
+        options: {
+          //...your regular options go here'
+          properties: { encryptedPassword: { isVisible: false } },
+        },
+        features: [hashPassword({
+          properties: {
+            encryptedPassword: 'myDbField',
+            password: 'password'
+          },
+          hash: argon2.hash,
+        })]
+      },
+    ],
   })
   const router = AdminJSExpress.buildRouter(adminJs)
 
