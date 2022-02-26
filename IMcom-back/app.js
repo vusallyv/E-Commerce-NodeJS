@@ -12,26 +12,42 @@ const hashPassword = require('@adminjs/passwords')
 AdminJS.registerAdapter(AdminJSMongoose)
 
 const run = async () => {
-  const mongooseDb = await mongoose.connect('mongodb+srv://vusallyv:pulsar12345@cluster0.86vlw.mongodb.net/test?authSource=admin&replicaSet=atlas-opqyuf-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true', { useNewUrlParser: true, useUnifiedTopology: true })
+  const mongooseDb = await mongoose.connect('mongodb+srv://vusallyv:gne8h7zRfQQSFpfY@cluster0.86vlw.mongodb.net/test?authSource=admin&replicaSet=atlas-opqyuf-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true', { useNewUrlParser: true, useUnifiedTopology: true })
 
   const adminJs = new AdminJS({
     databases: [mongooseDb],
     resources: [
       {
         resource: User,
-        options: {
-          //...your regular options go here'
-          properties: { encryptedPassword: { isVisible: false } },
-        },
-        features: [hashPassword({
-          properties: {
-            encryptedPassword: 'myDbField',
-            password: 'password'
-          },
-          hash: argon2.hash,
-        })]
+        // options: {
+        //   //...your regular options go here'
+        //   properties: { encryptedPassword: { isVisible: false, edit: false }, name: { isVisible: { list: false, filter: true, show: true, edit: true } }, status: { type: 'richtext' }, },
+        //   actions: {
+        //     new: {
+        //       before: async (req, res, next) => {
+        //         console.log('before')
+        //         const { name, email, password } = req.body
+        //         const user = new User({ name, email })
+        //         const hashedPassword = await hashPassword(password)
+        //         user.encryptedPassword = hashedPassword
+        //         await user.save()
+        //         next()
+        //       },
+        //     },
+        //   },
+        // },
+        // features: [hashPassword({
+        //   properties: {
+        //     encryptedPassword: 'myDbField',
+        //     password: 'password'
+        //   },
+        //   hash: argon2.hash,
+        // })]
       },
     ],
+    branding: {
+      companyName: 'I.M.com',
+    },
   })
   const router = AdminJSExpress.buildRouter(adminJs)
 
