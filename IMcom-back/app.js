@@ -1,5 +1,4 @@
 const path = require('path');
-
 const mongoose = require('mongoose')
 const AdminJS = require('adminjs')
 const AdminJSExpress = require('@adminjs/express')
@@ -10,54 +9,56 @@ const hashPassword = require('@adminjs/passwords')
 
 
 AdminJS.registerAdapter(AdminJSMongoose)
+// 'yusif763'
+const express = require('express');
+const app = express();
 
 const run = async () => {
-  const mongooseDb = await mongoose.connect('mongodb+srv://vusallyv:gne8h7zRfQQSFpfY@cluster0.86vlw.mongodb.net/test?authSource=admin&replicaSet=atlas-opqyuf-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true', { useNewUrlParser: true, useUnifiedTopology: true })
+  // const mongooseDb = await mongoose.connect(
+  //   'mongodb://mongodb:27018',
+  //   { useNewUrlParser: true, useUnifiedTopology: true })
+  mongoose.connect('mongodb://root:12345@localhost:27017/db1?authSource=admin')
+  .then(() => app.listen(8080, () => console.log(`Server Running on Port: http://localhost:8080`)))
+  .catch((error) => console.log(`${error} did not connect`));
 
   const adminJs = new AdminJS({
-    databases: [mongooseDb],
-    resources: [
-      {
-        resource: User,
-        // options: {
-        //   //...your regular options go here'
-        //   properties: { encryptedPassword: { isVisible: false, edit: false }, name: { isVisible: { list: false, filter: true, show: true, edit: true } }, status: { type: 'richtext' }, },
-        //   actions: {
-        //     new: {
-        //       before: async (req, res, next) => {
-        //         console.log('before')
-        //         const { name, email, password } = req.body
-        //         const user = new User({ name, email })
-        //         const hashedPassword = await hashPassword(password)
-        //         user.encryptedPassword = hashedPassword
-        //         await user.save()
-        //         next()
-        //       },
-        //     },
-        //   },
-        // },
-        // features: [hashPassword({
-        //   properties: {
-        //     encryptedPassword: 'myDbField',
-        //     password: 'password'
-        //   },
-        //   hash: argon2.hash,
-        // })]
-      },
-    ],
+    databases: [mongoose],
+    // resources: [
+    //   {
+    //     resource: User,
+    //     options: {
+    //       //...your regular options go here'
+    //       properties: { encryptedPassword: { isVisible: false, edit: false }, name: { isVisible: { list: false, filter: true, show: true, edit: true } }, status: { type: 'richtext' }, },
+    //       actions: {
+    //         new: {
+    //           properties: {
+    //             name: { isVisible: { list: false, filter: true, show: true, edit: true } },
+    //           },
+    //         },
+    //       },
+    //     },
+    //     features: [hashPassword({
+    //       properties: {
+    //         encryptedPassword: 'myDbField',
+    //         password: 'password'
+    //       },
+    //       hash: argon2.hash,
+    //     })]
+    //   },
+    // ],
     branding: {
       companyName: 'I.M.com',
     },
   })
-  const router = AdminJSExpress.buildRouter(adminJs)
+  return router = AdminJSExpress.buildRouter(adminJs)
 
-  app.use(adminJs.options.rootPath, router)
-  app.listen(8080, () => console.log('AdminJS is under localhost:8080/admin'))
+  // app.use(adminJs.options.rootPath, router)
+  // app.listen(8082, () => console.log('AdminJS is under localhost:8080/admin'))
 }
 
 run()
 
-const express = require('express');
+
 const bodyParser = require('body-parser');
 const multer = require('multer');
 
@@ -65,7 +66,7 @@ const cartRoutes = require('./routes/cart');
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/product');
 
-const app = express();
+
 
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -108,6 +109,7 @@ app.use((req, res, next) => {
 app.use('/cart', cartRoutes);
 app.use('/auth', authRoutes);
 app.use('/product', productRoutes);
+app.use('/admin', router);
 
 app.use((error, req, res, next) => {
   console.log(error);
