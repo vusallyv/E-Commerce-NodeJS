@@ -13,6 +13,7 @@ const fetchProducts = () => {
   })
     .then(response => response.json())
     .then(data => {
+      console.log(data);
       const productsDiv = document.getElementById('products');
       page_title = document.getElementById('page_title');
       page_title.innerHTML = 'Our Products';
